@@ -2,6 +2,16 @@ import { useEffect, useState } from 'react';
 
 const API_URL = '/api/students';
 
+async function readResponse(response) {
+  const body = await response.text();
+  if (!body) return {};
+  try {
+    return JSON.parse(body);
+  } catch {
+    return { error: body };
+  }
+}
+
 function App() {
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState({ studentId: '', name: '', email: '' });
@@ -10,7 +20,9 @@ function App() {
   const loadStudents = async () => {
     const response = await fetch(API_URL);
     if (!response.ok) throw new Error('Không thể tải danh sách sinh viên');
-    setStudents(await response.json());
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(data.error || 'Không thể tải danh sách sinh viên');
+    setStudents(data);
   };
 
   useEffect(() => {
@@ -26,7 +38,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
-      const data = await response.json();
+      const data = await readResponse(response);
       if (!response.ok) {
         setMessage(data.error || 'Không thể thêm sinh viên');
         return;

@@ -9,6 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+function requireDatabase(req, res, next) {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({ error: 'MongoDB Atlas chưa kết nối. Kiểm tra Network Access/IP whitelist.' });
+  }
+  next();
+}
+
+app.use('/api/students', requireDatabase);
+
 app.get('/api/students', async (req, res) => {
   try {
     res.json(await Student.find().sort({ createdAt: -1 }));
@@ -52,11 +61,7 @@ app.delete('/api/students/:id', async (req, res) => {
 const port = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-    app.listen(port, () => console.log(`Server running on port ${port}`));
-  })
-  .catch((err) => {
-    console.error('MongoDB connection failed:', err.message);
-    process.exitCode = 1;
-  });
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch((err) => console.error('MongoDB connection failed:', err.message));
+
+app.listen(port, () => console.log(`Server running on port ${port}`));
