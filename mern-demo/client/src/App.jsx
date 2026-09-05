@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const API_URL = 'http://localhost:5000/api/students';
+const API_URL = '/api/students';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -20,19 +20,23 @@ function App() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage('');
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error || 'Không thể thêm sinh viên');
-      return;
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setMessage(data.error || 'Không thể thêm sinh viên');
+        return;
+      }
+      setForm({ studentId: '', name: '', email: '' });
+      setStudents((current) => [data, ...current]);
+      setMessage('Đã thêm sinh viên');
+    } catch (error) {
+      setMessage(`Không kết nối được backend: ${error.message}`);
     }
-    setForm({ studentId: '', name: '', email: '' });
-    setStudents((current) => [data, ...current]);
-    setMessage('Đã thêm sinh viên');
   };
 
   const updateField = (field) => (event) => {
