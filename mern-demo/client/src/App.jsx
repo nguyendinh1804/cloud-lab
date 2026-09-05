@@ -19,9 +19,9 @@ function App() {
 
   const loadStudents = async () => {
     const response = await fetch(API_URL);
-    if (!response.ok) throw new Error('Không thể tải danh sách sinh viên');
     const data = await readResponse(response);
     if (!response.ok) throw new Error(data.error || 'Không thể tải danh sách sinh viên');
+    if (!Array.isArray(data)) throw new Error('API trả về dữ liệu không hợp lệ');
     setStudents(data);
   };
 
