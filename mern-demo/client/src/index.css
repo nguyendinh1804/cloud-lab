@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root { color: #17211b; background: #e8eee8; font-family: 'DM Sans', sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1080px; margin: 0 auto; padding: 72px 24px; }
+.intro { border-bottom: 1px solid #aebcaf; padding-bottom: 38px; }
+.eyebrow { color: #b1492f; font-size: .78rem; font-weight: 700; letter-spacing: .12em; }
+h1, h2 { font-family: 'Space Grotesk', sans-serif; }
+h1 { font-size: clamp(2.8rem, 8vw, 6.5rem); line-height: .95; margin: 20px 0; max-width: 720px; }
+.intro p:last-child { font-size: 1.1rem; }
+.workspace { display: grid; grid-template-columns: minmax(240px, .75fr) 1.25fr; gap: 56px; padding-top: 48px; }
+.student-form { border-left: 4px solid #b1492f; padding-left: 24px; }
+h2 { margin-top: 0; font-size: 1.55rem; }
+label { display: block; font-size: .85rem; font-weight: 700; margin: 18px 0; }
+input { display: block; width: 100%; border: 1px solid #9eab9f; background: #f5f7f2; padding: 12px; margin-top: 7px; font: inherit; }
+button { border: 0; background: #17211b; color: #fff; padding: 13px 18px; font: inherit; font-weight: 700; cursor: pointer; }
+.message { color: #b1492f; font-size: .9rem; }
+.list-heading { align-items: baseline; border-bottom: 2px solid #17211b; display: flex; justify-content: space-between; }
+.list-heading span { color: #67746a; font-size: .9rem; }
+.students article { display: grid; grid-template-columns: 110px 1fr 1.2fr; gap: 16px; border-bottom: 1px solid #c2ccc2; padding: 18px 0; }
+article a { color: #b1492f; }
+.empty { color: #67746a; }
+@media (max-width: 700px) {
+  main { padding: 40px 18px; }
+  .workspace { grid-template-columns: 1fr; gap: 42px; }
+  .students article { grid-template-columns: 1fr; gap: 5px; }
+}
