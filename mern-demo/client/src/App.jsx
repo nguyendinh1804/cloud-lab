@@ -16,6 +16,7 @@ function App() {
   const [students, setStudents] = useState([]);
   const [form, setForm] = useState({ studentId: '', name: '', email: '' });
   const [message, setMessage] = useState('');
+  const [editingId, setEditingId] = useState('');
 
   const loadStudents = async () => {
     const response = await fetch(API_URL);
@@ -33,22 +34,59 @@ function App() {
     event.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
+      const response = await fetch(editingId ? `${API_URL}/${editingId}` : API_URL, {
+        method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
       const data = await readResponse(response);
       if (!response.ok) {
-        setMessage(data.error || 'Không thể thêm sinh viên');
+        setMessage(data.error || (editingId ? 'Không thể cập nhật sinh viên' : 'Không thể thêm sinh viên'));
         return;
       }
       setForm({ studentId: '', name: '', email: '' });
-      setStudents((current) => [data, ...current]);
-      setMessage('Đã thêm sinh viên');
+      setEditingId('');
+      setStudents((current) => (
+        editingId
+          ? current.map((student) => (student._id === editingId ? data : student))
+          : [data, ...current]
+      ));
+      setMessage(editingId ? 'Đã cập nhật sinh viên' : 'Đã thêm sinh viên');
     } catch (error) {
       setMessage(`Không kết nối được backend: ${error.message}`);
     }
+  };
+
+  const handleEdit = (student) => {
+    setForm({ studentId: student.studentId, name: student.name, email: student.email });
+    setEditingId(student._id);
+    setMessage('Đang chỉnh sửa sinh viên');
+  };
+
+  const handleDelete = async (studentId) => {
+    setMessage('');
+    try {
+      const response = await fetch(`${API_URL}/${studentId}`, { method: 'DELETE' });
+      const data = await readResponse(response);
+      if (!response.ok) {
+        setMessage(data.error || 'Không thể xóa sinh viên');
+        return;
+      }
+      setStudents((current) => current.filter((student) => student._id !== studentId));
+      if (editingId === studentId) {
+        setForm({ studentId: '', name: '', email: '' });
+        setEditingId('');
+      }
+      setMessage('Đã xóa sinh viên');
+    } catch (error) {
+      setMessage(`Không kết nối được backend: ${error.message}`);
+    }
+  };
+
+  const cancelEdit = () => {
+    setForm({ studentId: '', name: '', email: '' });
+    setEditingId('');
+    setMessage('');
   };
 
   const updateField = (field) => (event) => {
@@ -64,11 +102,14 @@ function App() {
       </section>
       <section className="workspace">
         <form onSubmit={handleSubmit} className="student-form">
-          <h2>Thêm sinh viên</h2>
+          <h2>{editingId ? 'Cập nhật sinh viên' : 'Thêm sinh viên'}</h2>
           <label>MSSV<input required value={form.studentId} onChange={updateField('studentId')} /></label>
           <label>Họ tên<input required value={form.name} onChange={updateField('name')} /></label>
           <label>Email<input required type="email" value={form.email} onChange={updateField('email')} /></label>
-          <button type="submit">Thêm sinh viên</button>
+          <div className="form-actions">
+            <button type="submit">{editingId ? 'Cập nhật sinh viên' : 'Thêm sinh viên'}</button>
+            {editingId && <button type="button" className="secondary" onClick={cancelEdit}>Hủy</button>}
+          </div>
           {message && <p className="message">{message}</p>}
         </form>
         <section className="list">
@@ -77,9 +118,15 @@ function App() {
             <div className="students">
               {students.map((student) => (
                 <article key={student._id}>
-                  <strong>{student.studentId}</strong>
-                  <span>{student.name}</span>
-                  <a href={`mailto:${student.email}`}>{student.email}</a>
+                  <div>
+                    <strong>{student.studentId}</strong>
+                    <span>{student.name}</span>
+                    <a href={`mailto:${student.email}`}>{student.email}</a>
+                  </div>
+                  <div className="student-actions">
+                    <button type="button" className="secondary" onClick={() => handleEdit(student)}>Sửa</button>
+                    <button type="button" onClick={() => handleDelete(student._id)}>Xóa</button>
+                  </div>
                 </article>
               ))}
             </div>
