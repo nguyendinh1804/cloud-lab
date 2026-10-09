@@ -1,0 +1,26 @@
+services:
+  backend:
+    image: dinh18042005/mern-backend:1.0
+    container_name: mern-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./mern-demo/server/.env
+    environment:
+      PORT: 5000
+    networks:
+      - mern-network
+
+  frontend:
+    image: dinh18042005/mern-frontend:2.0
+    container_name: mern-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - mern-network
+
+networks:
+  mern-network:
+    driver: bridge

@@ -96,7 +96,7 @@ function App() {
   return (
     <main>
       <section className="intro">
-        <p className="eyebrow">CLOUD LAB / MERN</p>
+        <p className="eyebrow">CLOUD LAB / MERN v2.0</p>
         <h1>Student directory</h1>
         <p>Quản lý danh sách sinh viên từ MongoDB Atlas.</p>
       </section>
